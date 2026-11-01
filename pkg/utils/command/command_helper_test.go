@@ -76,12 +76,30 @@ func TestFakeStoragePartedNoop(t *testing.T) {
 	marker := filepath.Join(t.TempDir(), "called")
 	stubOnPATH(t, "parted", "echo yes >"+marker+"; exit 1")
 	t.Setenv("CASAOS_FAKE_STORAGE", "1")
+	t.Setenv("CASAOS_LSBLK_FILE", filepath.Join(t.TempDir(), "disks.json"))
 	out, err := ExecuteCommand("parted", "-s", "/dev/vdb", "print")
 	if err != nil || out != nil {
 		t.Fatalf("out=%q err=%v", out, err)
 	}
 	if _, err := os.Stat(marker); err == nil {
 		t.Fatal("parted invoked")
+	}
+}
+
+func TestFakeStorageAloneExecs(t *testing.T) {
+	marker := filepath.Join(t.TempDir(), "called")
+	stubOnPATH(t, "parted", "echo -n ok; echo yes >"+marker)
+	t.Setenv("CASAOS_FAKE_STORAGE", "1")
+	t.Setenv("CASAOS_LSBLK_FILE", "")
+	out, err := ExecuteCommand("parted", "-s", "/dev/vdb", "print")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(out) != "ok" {
+		t.Fatalf("out %q", out)
+	}
+	if _, err := os.Stat(marker); err != nil {
+		t.Fatal("parted not invoked")
 	}
 }
 

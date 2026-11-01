@@ -84,7 +84,7 @@ Both pass on Linux with Go 1.23. `TestLiveMountSourceControl` needs a real merge
 Two development-only environment variables, unset on an installed box:
 
 - `CASAOS_LSBLK_FILE` — when set to a path, `ExecLSBLK` returns that file's bytes instead of running host `lsblk`. `ExecLSBLKByPath` filters the same document. An unreadable file is the same as a failed `lsblk`: empty.
-- `CASAOS_FAKE_STORAGE=1` — `mount`, `umount`, `parted`, `partprobe`, `e2label` and `sfdisk` return success without exec. Other names still exec; `lsblk --pairs` is not redirected (disk listing uses `ExecLSBLK` only).
+- `CASAOS_FAKE_STORAGE=1` — `mount`, `umount`, `parted`, `partprobe`, `e2label` and `sfdisk` return success without exec, and only when `CASAOS_LSBLK_FILE` is also set (so a lone `=1` on a real box still runs the real commands). Other names still exec; `lsblk --pairs` is not redirected (disk listing uses `ExecLSBLK` only). `mdadm`, `mkfs` and `wipefs` are not faked: RAID and format flows run the real commands and fail without root.
 
 The local process stack in CasaOS (`../CasaOS/dev/stack.sh`) sets both, writes a two-disk fixture, and leaves `EnableMergerFS=false`. See CasaOS `dev/README.md`.
 

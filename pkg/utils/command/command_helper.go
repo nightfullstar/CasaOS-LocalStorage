@@ -36,7 +36,9 @@ func ExecEnabledSMART(path string) ([]byte, error) {
 
 func lsblkFile() string { return os.Getenv("CASAOS_LSBLK_FILE") }
 
-func fakeStorage() bool { return os.Getenv("CASAOS_FAKE_STORAGE") == "1" }
+func fakeStorage() bool {
+	return os.Getenv("CASAOS_FAKE_STORAGE") == "1" && lsblkFile() != ""
+}
 
 func readLSBLKFile() []byte {
 	p := lsblkFile()
